@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+</head>
+  <script src="pixi.js"></script>
+  
+<body>
+  <script type="text/javascript">
+	//check if PIXI is loaded 
+    var type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported())
+	{
+      type = "canvas"
+    }
+    PIXI.utils.sayHello(type)
+	
+	//stage container
+	var stage = new PIXI.Container();
+	
+	//renderer
+	var renderer = PIXI.autoDetectRenderer(512, 512);
+	document.body.appendChild(renderer.view);
+	renderer.backgroundColor = 0xd4cece;
+	renderer.view.style.border = "1px solid black";
+	
+	//load texture
+	PIXI.loader
+	.add("arrow.png")
+	.load(setup);
+
+	//setup sprite
+	function setup()
+	{
+		var sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
+		sprite.scale.set(0.05, 0.05);
+		sprite.x = 256;
+		sprite.y = 256;
+		stage.addChild(sprite);
+		console.log("rotation is " + sprite.rotation);
+		
+		//renderer to stage
+		renderer.render(stage);
+	}
+	
+	
+	
+	
+  </script>
+</body>
+
+</html>

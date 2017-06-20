@@ -1,0 +1,6 @@
+simple trig functions to avoid physics and vectors
+
+function move(object, distance) {
+	object.x = object.x + distance * Math.cos(object.rotation);
+	object.y = object.y + distance * Math.sin(object.rotation);
+}
