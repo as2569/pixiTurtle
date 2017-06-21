@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Hello World</title>
+  <title>Turtle</title>
 </head>
   <script src="pixi.js"></script>
   
@@ -15,10 +15,13 @@
 	{
       type = "canvas"
     }
-    PIXI.utils.sayHello(type)
+    PIXI.utils.sayHello(type);
+	
+	//turtle variable
+	var t;
 	
 	//stage container
-	var stage = new PIXI.Container();
+	var pixiStage = new PIXI.Container();
 	
 	//renderer
 	var renderer = PIXI.autoDetectRenderer(512, 512);
@@ -29,24 +32,48 @@
 	//load texture
 	PIXI.loader
 	.add("arrow.png")
+	//calls setup after resources are done loading
 	.load(setup);
+	
+	class Turtle
+	{	
+		//constructor
+		constructor(stage)
+		{	
+			//this tells JS to assume that member variable called .whatever exists within calling object, and to work with it
+			this.stage = stage;
+			this.sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
+			this.sprite.scale.set(0.05, 0.05);
+			this.sprite.x = 256;
+			this.sprite.y = 256;
+			this.sprite.rotation = 0;
+			stage.addChild(this.sprite);
+			//console.log("rotation is " + sprite.rotation);
+		}
+		
+		forward(integer)
+		{
+			this.sprite.x += integer;
+			return;
+		}	
+		
+	}	
 
-	//setup sprite
-	function setup()
+	function setup(t)
 	{
-		var sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
-		sprite.scale.set(0.05, 0.05);
-		sprite.x = 256;
-		sprite.y = 256;
-		stage.addChild(sprite);
-		console.log("rotation is " + sprite.rotation);
+		t = new Turtle(pixiStage);
+
+		t.forward(100);	
 		
 		//renderer to stage
-		renderer.render(stage);
+		renderer.render(pixiStage);
 	}
 	
-	
-	
+	function gameLoop()
+	{
+		requestAnimationFrame(gameLoop);		
+		renderer.render(pixiStage);
+	}
 	
   </script>
 </body>
