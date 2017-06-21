@@ -37,6 +37,7 @@
 	
 	class Turtle
 	{	
+		
 		//constructor
 		constructor(stage)
 		{	
@@ -47,15 +48,50 @@
 			this.sprite.x = 256;
 			this.sprite.y = 256;
 			this.sprite.rotation = 0;
+			this.penIsDown = true;
 			stage.addChild(this.sprite);
-			//console.log("rotation is " + sprite.rotation);
+			
+		}
+		
+		right(integer)
+		{
+			this.sprite.rotation = integer * (Math.PI/180);
+			return;
+		}
+		
+		left(integer)
+		{
+			this.sprite.rotation = -1 * (integer * (Math.PI/180));
+			return;
 		}
 		
 		forward(integer)
-		{
-			this.sprite.x += integer;
+		{	
+			this.sprite.x = this.sprite.x + integer * Math.cos(this.sprite.rotation);
+			this.sprite.y = this.sprite.y + integer * Math.sin(this.sprite.rotation); 
 			return;
 		}	
+		
+		back(integer)
+		{	
+			this.sprite.x = this.sprite.x - integer * Math.cos(this.sprite.rotation);
+			this.sprite.y = this.sprite.y - integer * Math.sin(this.sprite.rotation); 
+			return;
+		}	
+		
+		penup()
+		{
+			this.penIsDown = false;
+			console.log(this.penIsDown);
+			return;
+		}
+		
+		pendown()
+		{
+			this.penIsDown = true;
+			console.log(this.penIsDown);
+			return;
+		}
 		
 	}	
 
@@ -63,7 +99,9 @@
 	{
 		t = new Turtle(pixiStage);
 
-		t.forward(100);	
+		t.right(40);
+		t.back(100);
+		t.pendown();
 		
 		//renderer to stage
 		renderer.render(pixiStage);
