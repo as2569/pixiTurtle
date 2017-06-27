@@ -77,15 +77,19 @@
 			var currentY = this.sprite.y;
 			this.sprite.x = this.sprite.x + integer * Math.cos(this.sprite.rotation);
 			this.sprite.y = this.sprite.y + integer * Math.sin(this.sprite.rotation); 
-			this.drawline(currentX, currentY, this.sprite.x, this.sprite.y);
+			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
 			
 			return;
 		}	
 		
 		back(integer)
 		{	
+			var currentX = this.sprite.x;
+			var currentY = this.sprite.y;
 			this.sprite.x = this.sprite.x - integer * Math.cos(this.sprite.rotation);
 			this.sprite.y = this.sprite.y - integer * Math.sin(this.sprite.rotation); 
+			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
+			
 			return;
 		}	
 		
@@ -103,7 +107,7 @@
 			return;
 		}
 		
-		drawline(beginX, beginY, endX, endY)
+		drawLine(beginX, beginY, endX, endY)
 		{
 			if(this.penIsDown == true)
 			{
@@ -122,8 +126,11 @@
 	{
 		t = new Turtle(pixiStage);
 
-		t.forward(150);
-		//t.drawline();
+		t.back(50);
+		t.penup()
+		t.back(50);
+		t.pendown();
+		t.back(50);
 		
 		//renderer to stage
 		renderer.render(pixiStage);
