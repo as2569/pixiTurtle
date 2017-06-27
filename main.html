@@ -19,12 +19,19 @@
 	
 	//turtle variable
 	var t;
+	var screenWidth = 512;
+	var screenHeight = 512;
 	
 	//stage container
 	var pixiStage = new PIXI.Container();
 	
+	//pixi Graphics
+	var graphics = new PIXI.Graphics();
+	//setting this will make all adjustment relative to this as origin
+	//graphics.position.set(x, y);
+	
 	//renderer
-	var renderer = PIXI.autoDetectRenderer(512, 512);
+	var renderer = PIXI.autoDetectRenderer(screenWidth, screenHeight);
 	document.body.appendChild(renderer.view);
 	renderer.backgroundColor = 0xd4cece;
 	renderer.view.style.border = "1px solid black";
@@ -32,25 +39,24 @@
 	//load texture
 	PIXI.loader
 	.add("arrow.png")
-	//calls setup after resources are done loading
-	.load(setup);
+	.load(setup); //calls setup after resources are done loading
 	
 	class Turtle
-	{	
-		
+	{			
 		//constructor
 		constructor(stage)
 		{	
 			//this tells JS to assume that member variable called .whatever exists within calling object, and to work with it
 			this.stage = stage;
+			this.graphics = graphics;
 			this.sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
 			this.sprite.scale.set(0.05, 0.05);
-			this.sprite.x = 256;
-			this.sprite.y = 256;
+			this.sprite.x = screenWidth/2;
+			this.sprite.y = screenHeight/2;
 			this.sprite.rotation = 0;
 			this.penIsDown = true;
 			stage.addChild(this.sprite);
-			
+			stage.addChild(this.graphics);
 		}
 		
 		right(integer)
@@ -66,9 +72,13 @@
 		}
 		
 		forward(integer)
-		{	
+		{	 
+			var currentX = this.sprite.x;
+			var currentY = this.sprite.y;
 			this.sprite.x = this.sprite.x + integer * Math.cos(this.sprite.rotation);
 			this.sprite.y = this.sprite.y + integer * Math.sin(this.sprite.rotation); 
+			this.drawline(currentX, currentY, this.sprite.x, this.sprite.y);
+			
 			return;
 		}	
 		
@@ -93,15 +103,27 @@
 			return;
 		}
 		
+		drawline(beginX, beginY, endX, endY)
+		{
+			if(this.penIsDown == true)
+			{
+				this.graphics.lineStyle(3, 0xFF0000);
+				this.graphics.moveTo(beginX, beginY);
+				this.graphics.lineTo(endX, endY);
+				//console.log(startingX, startingY, this.sprite.x, this.sprite.y);
+				//console.log("drew a line");
+			}
+		}	
+		
 	}	
 
+	//eventually this function should be separated into SETUP and RUNNING functions
 	function setup(t)
 	{
 		t = new Turtle(pixiStage);
 
-		t.right(40);
-		t.back(100);
-		t.pendown();
+		t.forward(150);
+		//t.drawline();
 		
 		//renderer to stage
 		renderer.render(pixiStage);
