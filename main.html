@@ -38,7 +38,10 @@
 	
 	//load texture
 	PIXI.loader
-	.add("arrow.png")
+	.add("arrow.png") // turtle
+	.add("blueSquare.jpg") // background image
+	.add("circle.png") // mask
+	.add("checkered.png") // skin
 	.load(setup); //calls setup after resources are done loading
 	
 	class Turtle
@@ -50,13 +53,32 @@
 			this.stage = stage;
 			this.graphics = graphics;
 			this.sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
+			this.guts = new PIXI.Sprite(PIXI.loader.resources["blueSquare.jpg"].texture);
+			this.skin = new PIXI.Sprite(PIXI.loader.resources["checkered.png"].texture);
+			this.mask = new PIXI.Sprite(PIXI.loader.resources["circle.png"].texture);
+			
+			this.mask.anchor.set(0.5);
+			this.mask.x = 256;
+			this.mask.y = 256;
+			this.skin.mask = this.mask;
+			
 			this.sprite.scale.set(0.05, 0.05);
 			this.sprite.x = screenWidth/2;
 			this.sprite.y = screenHeight/2;
 			this.sprite.rotation = 0;
 			this.penIsDown = true;
+			
+			stage.addChild(this.guts);
 			stage.addChild(this.sprite);
 			stage.addChild(this.graphics);
+			stage.addChild(this.mask);
+			stage.addChild(this.skin);
+		}
+		
+		moveMask()
+		{
+			this.mask.x = this.sprite.x;
+			this.mask.y = this.sprite.y;
 		}
 		
 		right(integer)
@@ -78,6 +100,7 @@
 			this.sprite.x = this.sprite.x + integer * Math.cos(this.sprite.rotation);
 			this.sprite.y = this.sprite.y + integer * Math.sin(this.sprite.rotation); 
 			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
+			this.moveMask();
 			
 			return;
 		}	
@@ -89,6 +112,7 @@
 			this.sprite.x = this.sprite.x - integer * Math.cos(this.sprite.rotation);
 			this.sprite.y = this.sprite.y - integer * Math.sin(this.sprite.rotation); 
 			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
+			this.moveMask();
 			
 			return;
 		}	
@@ -126,11 +150,9 @@
 	{
 		t = new Turtle(pixiStage);
 
-		t.back(50);
-		t.penup()
-		t.back(50);
-		t.pendown();
-		t.back(50);
+		t.forward(50);
+		t.right(90);
+		t.forward(50);
 		
 		//renderer to stage
 		renderer.render(pixiStage);
