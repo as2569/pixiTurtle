@@ -17,8 +17,9 @@
     }
     PIXI.utils.sayHello(type);
 	
-	//turtle variable
+	//global vars
 	var t;
+	var commands = [];
 	var screenWidth = 512;
 	var screenHeight = 512;
 	
@@ -81,45 +82,51 @@
 			this.mask.y = this.sprite.y;
 		}
 		
-		right(integer)
+		right(t, integer)
 		{
-			this.sprite.rotation = integer * (Math.PI/180);
+			t.targetRotation = integer * (Math.PI/180);
+			t.startRotation = t.sprite.rotation;
 			return;
 		}
 		
-		left(integer)
+		left(t, integer)
 		{
-			this.sprite.rotation = -1 * (integer * (Math.PI/180));
+			t.targetRotation = -integer * (Math.PI/180);
+			t.startRotation = t.sprite.rotation;
 			return;
 		}
 		
-		forward(integer)
+		forward(t, integer)
 		{	 
-			var currentX = this.sprite.x;
-			var currentY = this.sprite.y;
-			this.sprite.x = this.sprite.x + integer * Math.cos(this.sprite.rotation);
-			this.sprite.y = this.sprite.y + integer * Math.sin(this.sprite.rotation); 
-			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
-			this.moveMask();
-			
+			var targetPosition = {};
+			var startPosition = {};
+			targetPosition.x = t.sprite.x + integer * Math.cos(t.sprite.rotation);
+			targetPosition.y = t.sprite.y + integer * Math.sin(t.sprite.rotation);
+			startPosition.x = t.sprite.x;
+			startPosition.y = t.sprite.y;
+			t.targetPosition = targetPosition;
+			t.startPosition = startPosition;
+			t.drawLine(t.sprite.x, t.sprite.y, t.sprite.x, t.sprite.y);			
 			return;
 		}	
 		
-		back(integer)
+		back(t, integer)
 		{	
-			var currentX = this.sprite.x;
-			var currentY = this.sprite.y;
-			this.sprite.x = this.sprite.x - integer * Math.cos(this.sprite.rotation);
-			this.sprite.y = this.sprite.y - integer * Math.sin(this.sprite.rotation); 
-			this.drawLine(currentX, currentY, this.sprite.x, this.sprite.y);
-			this.moveMask();
-			
+			var targetPosition = {};
+			var startPosition = {};
+			targetPosition.x = t.sprite.x - integer * Math.cos(t.sprite.rotation);
+			targetPosition.y = t.sprite.y - integer * Math.sin(t.sprite.rotation);
+			startPosition.x = t.sprite.x;
+			startPosition.y = t.sprite.y;
+			t.targetPosition = targetPosition;
+			t.startPosition = startPosition;
+			t.drawLine(t.sprite.x, t.sprite.y, t.sprite.x, t.sprite.y);			
 			return;
 		}	
 		
 		penup()
 		{
-			this.penIsDown = false;
+			t.penIsDown = false;
 			console.log(this.penIsDown);
 			return;
 		}
@@ -141,28 +148,128 @@
 				//console.log(startingX, startingY, this.sprite.x, this.sprite.y);
 				//console.log("drew a line");
 			}
-		}	
-		
+		}		
 	}	
-
-	//eventually this function should be separated into SETUP and RUNNING functions
-	function setup(t)
+	function updateTurtleSprite()
+	{
+		if(t.stepTimer != null && t.stepTimeRemaining > 0)
+		{
+			t.stepTimeRemaining -= 32;
+			if(t.stepTimeRemaining < 0)
+				t.stepTimeRemaining = 0;
+			setTimeout(updateTurtleSprite, 32);
+		}else{
+			return;
+			}
+			
+		var x = (t.stepTimer - t.stepTimeRemaining) / t.stepTimer;
+			
+		if(t.targetRotation != null)
+		{
+			t.sprite.rotation = t.targetRotation * x + t.startRotation * (1 - x); 
+		}
+		
+		if(t.targetPosition != null)
+		{
+			var oldPosition = {};
+			oldPosition.x = t.sprite.x;
+			oldPosition.y = t.sprite.y;
+			t.sprite.x = t.targetPosition.x * x + t.startPosition.x * (1 - x);
+			t.sprite.y = t.targetPosition.y * x + t.startPosition.y * (1 - x);
+			//t.graphics.clear();
+			t.drawLine(oldPosition.x, oldPosition.y, t.sprite.x, t.sprite.y);
+			t.moveMask();
+		}
+	}
+	
+	function setup()
 	{
 		t = new Turtle(pixiStage);
-
-		t.forward(50);
-		t.right(90);
-		t.forward(50);
 		
-		//renderer to stage
+		setTimeout(commandList, 500);
+		setInterval(runIt, 32);
 		renderer.render(pixiStage);
 	}
 	
-	function gameLoop()
+	function commandList()
 	{
-		requestAnimationFrame(gameLoop);		
+		<!-- commands.push([t.forward, 50]); -->
+		<!-- commands.push([t.right, 90]); -->
+		<!-- commands.push([t.forward, 100]);	 -->
+		<!-- commands.push([t.back, 150]); -->
+		
+		commands.push(['forward', 50]);
+		commands.push(['right', 90]);
+		commands.push(['forward', 100]);	
+		commands.push(['back', 150]);
+		updateTurtleCommands();
+	}
+	
+	function turtleStep(command)
+	{
+		var nextStep = 0;
+		
+		if(command[0] == 'forward')
+		{
+			t.forward(t, command[1]);
+			nextStep = command[1]/25 * 1000;
+		}
+		if(command[0] == 'back')
+		{
+			t.back(t, command[1]);
+			nextStep = command[1]/25 * 1000;
+		}
+		if(command[0] == 'left')
+		{
+			t.left(t, command[1]);
+			nextStep = command[1]/90 * 1000;	
+		}
+		if(command[0] == 'right')
+		{
+			t.right(t, command[1]);
+			nextStep = command[1]/90 * 1000;
+		}
+		return nextStep;
+	}
+	
+	function updateTurtleCommands()
+	{
+		var hasNext = true;
+		console.log("Update Turtle Commands started.");
+		if(t.stepTimer > 0)
+		{
+			t.stepTimeRemaining = 0;
+			updateTurtleSprite();
+			console.log("Update Turtle Sprite Forced to Run at 0.");
+		}
+		t.targetPosition = null;
+		t.targetRotation = null;
+		t.startPosition = null;
+		t.startRotation = null;
+		if(commands == null || commands.length <= 0)
+			return;
+		
+		console.log("running command " + commands[0]);
+		var command = commands[0];
+		if(command != null)
+		{
+			var timer = turtleStep(command);
+			setTimeout(updateTurtleCommands, timer);
+			t.stepTimeRemaining = timer;
+			t.stepTimer = timer;
+			if(timer > 0)
+				updateTurtleSprite();
+			
+			console.log("Waiting " + timer + " milliseconds.");
+			commands.shift();
+		}
+	}
+	
+	function runIt()
+	{
 		renderer.render(pixiStage);
 	}
+	
 	
   </script>
 </body>
