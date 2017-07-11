@@ -40,7 +40,7 @@
 	//load texture
 	PIXI.loader
 	.add("arrow.png") // turtle
-	.add("blueSquare.jpg") // background image
+	.add("fracture1.png") // background image
 	.add("circle.png") // mask
 	.add("checkered.png") // skin
 	.load(setup); //calls setup after resources are done loading
@@ -54,7 +54,7 @@
 			this.stage = stage;
 			this.graphics = graphics;
 			this.sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
-			this.guts = new PIXI.Sprite(PIXI.loader.resources["blueSquare.jpg"].texture);
+			this.guts = new PIXI.Sprite(PIXI.loader.resources["fracture1.png"].texture);
 			this.skin = new PIXI.Sprite(PIXI.loader.resources["checkered.png"].texture);
 			this.mask = new PIXI.Sprite(PIXI.loader.resources["circle.png"].texture);
 			
@@ -64,6 +64,7 @@
 			this.skin.mask = this.mask;
 			
 			this.sprite.scale.set(0.05, 0.05);
+			this.sprite.anchor.set(0.5);
 			this.sprite.x = screenWidth/2;
 			this.sprite.y = screenHeight/2;
 			this.sprite.rotation = 0;
@@ -82,21 +83,49 @@
 			this.mask.y = this.sprite.y;
 		}
 		
-		right(t, integer)
+		right(integer)
+		{
+			commands.push(['right', integer]);
+		}
+		left(integer)
+		{
+			commands.push(['left', integer]);
+		}
+		forward(integer)
+		{
+			commands.push(['forward', integer]);
+		}
+		back(integer)
+		{
+			commands.push(['back', integer]);
+		}
+		up()
+		{
+			commands.push(['up']);
+		}
+		down()
+		{
+			commands.push(['down']);
+		}
+		right(integer)
+		{
+			commands.push(['right', integer]);
+		}
+		cmd_right(t, integer)
 		{
 			t.targetRotation = integer * (Math.PI/180);
 			t.startRotation = t.sprite.rotation;
 			return;
 		}
 		
-		left(t, integer)
+		cmd_left(t, integer)
 		{
 			t.targetRotation = -integer * (Math.PI/180);
 			t.startRotation = t.sprite.rotation;
 			return;
 		}
 		
-		forward(t, integer)
+		cmd_forward(t, integer)
 		{	 
 			var targetPosition = {};
 			var startPosition = {};
@@ -110,7 +139,7 @@
 			return;
 		}	
 		
-		back(t, integer)
+		cmd_back(t, integer)
 		{	
 			var targetPosition = {};
 			var startPosition = {};
@@ -124,18 +153,26 @@
 			return;
 		}	
 		
-		penup()
+		cmd_up()
 		{
 			t.penIsDown = false;
-			console.log(this.penIsDown);
 			return;
 		}
 		
-		pendown()
+		cmd_down()
 		{
 			this.penIsDown = true;
-			console.log(this.penIsDown);
 			return;
+		}
+		
+		up()
+		{
+			commands.push(['up']);
+		}
+		
+		down()
+		{
+			commands.push(['down']);
 		}
 		
 		drawLine(beginX, beginY, endX, endY)
@@ -197,37 +234,44 @@
 		<!-- commands.push([t.right, 90]); -->
 		<!-- commands.push([t.forward, 100]);	 -->
 		<!-- commands.push([t.back, 150]); -->
-		
-		commands.push(['forward', 50]);
-		commands.push(['right', 90]);
-		commands.push(['forward', 100]);	
-		commands.push(['back', 150]);
+		t.forward(50);
+		t.right(90);
+		t.forward(100);
+		t.back(150);
+		//commands.push(['forward', 50]);
+		//commands.push(['right', 90]);
+		//commands.push(['forward', 100]);	
+		//commands.push(['back', 150]);
 		updateTurtleCommands();
 	}
 	
 	function turtleStep(command)
 	{
 		var nextStep = 0;
-		
-		if(command[0] == 'forward')
+		switch(command[0])
 		{
-			t.forward(t, command[1]);
+		case 'forward':
+			t.cmd_forward(t, command[1]);
 			nextStep = command[1]/25 * 1000;
-		}
-		if(command[0] == 'back')
-		{
-			t.back(t, command[1]);
+			break;
+		case 'back':
+			t.cmd_back(t, command[1]);
 			nextStep = command[1]/25 * 1000;
-		}
-		if(command[0] == 'left')
-		{
-			t.left(t, command[1]);
+		break;
+		case 'left':
+			t.cmd_left(t, command[1]);
 			nextStep = command[1]/90 * 1000;	
-		}
-		if(command[0] == 'right')
-		{
-			t.right(t, command[1]);
+		break;
+		case 'right':
+			t.cmd_right(t, command[1]);
 			nextStep = command[1]/90 * 1000;
+		break;
+		case 'up':
+			t.cmd_up(t);
+		break;
+		case 'down':
+			t.cmd_down(t);
+		break;
 		}
 		return nextStep;
 	}
@@ -267,6 +311,8 @@
 	
 	function runIt()
 	{
+		pixiStage.removeChild(t.sprite);
+		pixiStage.addChild(t.sprite);
 		renderer.render(pixiStage);
 	}
 	
