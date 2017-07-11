@@ -107,10 +107,11 @@
 		{
 			commands.push(['down']);
 		}
-		right(integer)
+		reset()
 		{
-			commands.push(['right', integer]);
+			commands.push(['reset']);
 		}
+		
 		cmd_right(t, integer)
 		{
 			t.targetRotation = integer * (Math.PI/180);
@@ -165,14 +166,14 @@
 			return;
 		}
 		
-		up()
+		cmd_reset(t)
 		{
-			commands.push(['up']);
-		}
-		
-		down()
-		{
-			commands.push(['down']);
+			t.sprite.x = screenWidth/2;
+			t.sprite.y = screenHeight/2;
+			t.sprite.rotation = 0;
+			t.moveMask();
+			t.graphics.clear();
+			return;
 		}
 		
 		drawLine(beginX, beginY, endX, endY)
@@ -238,6 +239,7 @@
 		t.right(90);
 		t.forward(100);
 		t.back(150);
+		t.reset();
 		//commands.push(['forward', 50]);
 		//commands.push(['right', 90]);
 		//commands.push(['forward', 100]);	
@@ -253,7 +255,7 @@
 		case 'forward':
 			t.cmd_forward(t, command[1]);
 			nextStep = command[1]/25 * 1000;
-			break;
+		break;
 		case 'back':
 			t.cmd_back(t, command[1]);
 			nextStep = command[1]/25 * 1000;
@@ -271,6 +273,9 @@
 		break;
 		case 'down':
 			t.cmd_down(t);
+		break;
+		case 'reset':
+			t.cmd_reset(t);
 		break;
 		}
 		return nextStep;
@@ -314,8 +319,9 @@
 		pixiStage.removeChild(t.sprite);
 		pixiStage.addChild(t.sprite);
 		renderer.render(pixiStage);
+		
 	}
-	
+	//cmd_reset();
 	
   </script>
 </body>
