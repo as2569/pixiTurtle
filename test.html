@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Test</title>
+</head>
+  <script src="pixi.js"></script>
+
+<body>
+  <script type="text/javascript">
+var app = new PIXI.Application();
+document.body.appendChild(app.view);
+
+PIXI.loader
+    .add('detector.json')
+    .load(onAssetsLoaded);
+
+function onAssetsLoaded()
+{
+    // create an array of textures from an image path
+    var frames = [];
+	var timesRan = 0;
+	
+    for (var i = 1; i <= 25; i++)
+	{
+		frames.push(PIXI.Texture.fromFrame('detector' + i));
+	}
+
+    // create an AnimatedSprite 
+    var anim = new PIXI.extras.AnimatedSprite(frames);
+
+    /*
+     * An AnimatedSprite inherits all the properties of a PIXI sprite
+     * so you can change its position, its anchor, mask it, etc
+     */
+    anim.x = app.renderer.width / 2;
+    anim.y = app.renderer.height / 2;
+	anim.alpha = 50;
+    anim.anchor.set(0.5);
+    anim.animationSpeed = 0.5;
+	anim.onLoop = function() {timesRan++, console.log(timesRan);}
+	anim.play();
+
+    app.stage.addChild(anim);
+	
+    app.ticker.add();
+		
+}
+	
+   </script>
+</body>
+
+</html>
