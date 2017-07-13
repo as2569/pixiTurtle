@@ -8,6 +8,97 @@
   <script src="pixi.js"></script>
   
 <body>
+<script type="text/javascript"> 
+
+
+	
+function openTab(evt, tabName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    test=document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+	
+</script> 
+
+<div id = "editor" style = "display: inline-block; float: left; text-align: left; width:50%">
+
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'Code')" id = "defaultOpen">Code</button>
+  <button class="tablinks" onclick="openTab(event, 'Output')">Output</button>
+  <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
+</div>
+
+
+
+
+<!-- <div id = "editor" style = "display: inline-block; float: left; text-align: left; width:50%"> -->
+
+<div style="background-color:00FFFF" id= "Code" class ="tabcontent">
+<textarea style="background-color:FFFFFF; border: none" id=yourcode cols="40" rows="10">
+</textarea><br /> 
+<!-- Create a simple CodeMirror instance -->
+<link rel="stylesheet" href="lib/codemirror.css">
+<script src="lib/codemirror.js"></script>
+<script src="mode/javascript/javascript.js"></script>
+  <script>
+	var editor = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
+      lineNumbers: true,
+      mode: "text/html",
+      matchBrackets: true
+    });
+  </script>
+
+
+</div>
+
+<div id = "Output" class ="tabcontent">
+
+<pre id="output"></pre>
+ 
+</div>
+
+<div id = "Instructions" class="tabcontent">
+<textarea style="border: none" cols="40" rows="10">
+iashdfisadf
+asdfsadfsdf
+asdgsadg
+asdfsdaf
+asfsadff
+</textarea><br /> 
+</div>
+
+<br>
+<script>
+	document.getElementById("defaultOpen").click();
+	<!-- console.log("click"); -->
+</script>
+<button type="button" onclick="evaluateCode()">Run</button> 
+</div>
+<!-- </div> -->
+
+<div id = "turtle" style = "display: inline-block; float: right; text-align: left; width:50%">
+<!-- Just the output, NO turtle graphics -->
+
+<!-- If you want turtle graphics include a canvas -->
+<!-- <canvas width = "400" height = "800" style="background-image:url('image.png')" id="mycanvas"> -->
+<div class= "canvas" id="mycanvas">
+  <script src="pixi.js"></script>
+  
   <script type="text/javascript">
 	//check if PIXI is loaded 
     var type = "WebGL"
@@ -20,9 +111,11 @@
 	//global vars
 	var t;
 	var commands = [];
-	var screenWidth = 512;
-	var screenHeight = 512;
-	
+	var problems = [];
+	var screenWidth = 500;
+	var screenHeight = 500;
+	var evaluating = false;
+	var setupComplete = false;
 	//stage container
 	var pixiStage = new PIXI.Container();
 	
@@ -42,9 +135,12 @@
 	.add("arrow.png") // turtle
 	.add("fracture1.png") // background image
 	.add("circle.png") // mask
-	.add("checkered.png") // skin
+	.add("arm.png") // skin
+	.add("grid.png")
+	.add("detector.json")
 	.load(setup); //calls setup after resources are done loading
-	
+	//Testing problems
+	problems.push({position:{x:250, y:250}, type:'infection', detected:false});
 	class Turtle
 	{			
 		//constructor
@@ -55,12 +151,23 @@
 			this.graphics = graphics;
 			this.sprite = new PIXI.Sprite(PIXI.loader.resources["arrow.png"].texture);
 			this.guts = new PIXI.Sprite(PIXI.loader.resources["fracture1.png"].texture);
-			this.skin = new PIXI.Sprite(PIXI.loader.resources["checkered.png"].texture);
+			this.skin = new PIXI.Sprite(PIXI.loader.resources["arm.png"].texture);
+			this.backskin = new PIXI.Sprite(PIXI.loader.resources["arm.png"].texture);
 			this.mask = new PIXI.Sprite(PIXI.loader.resources["circle.png"].texture);
+			this.grid = new PIXI.Sprite(PIXI.loader.resources["grid.png"].texture);
+			//Adding the detector pulse animation
+			var detectArray = [];
+			for(var i = 1;i <= 25;i++)
+				detectArray.push(PIXI.Texture.fromFrame("detector"+i));
+			this.detector = new PIXI.extras.AnimatedSprite(detectArray);
+			this.detector.animationSpeed = 0.5;
+			this.detector.loop = true;
+			this.detector.visible = false;
+			this.detector.anchor.set(0.5);
 			
 			this.mask.anchor.set(0.5);
-			this.mask.x = 256;
-			this.mask.y = 256;
+			this.mask.x = 250;
+			this.mask.y = 250;
 			this.skin.mask = this.mask;
 			
 			this.sprite.scale.set(0.05, 0.05);
@@ -70,17 +177,66 @@
 			this.sprite.rotation = 0;
 			this.penIsDown = true;
 			
+			this.backskin.tint = 0x001888;
+			stage.addChild(this.backskin);
 			stage.addChild(this.guts);
 			stage.addChild(this.sprite);
 			stage.addChild(this.graphics);
 			stage.addChild(this.mask);
 			stage.addChild(this.skin);
+			stage.addChild(this.detector);
+			stage.addChild(this.grid);
 		}
 		
 		moveMask()
 		{
 			this.mask.x = this.sprite.x;
 			this.mask.y = this.sprite.y;
+		}
+		
+		detect(type)
+		{
+			var detected = false;
+			var length = commands.length;
+			var testPosition = {x:t.sprite.x, y:t.sprite.y};
+			var testRotation = t.sprite.rotation;
+			//Walk through the command list to find final destination, add an event to the stack if successful
+			for(var i = 0;i < length;i++)
+			{
+				switch(commands[0])
+				{
+					case 'forward':
+						testPosition.x = testPosition.x + integer * Math.cos(testRotation);
+						testPosition.y = testPosition.y + integer * Math.sin(testRotation);
+						break;
+					case 'back':
+						testPosition.x = testPosition.x - integer * Math.cos(testRotation);
+						testPosition.y = testPosition.y - integer * Math.sin(testRotation);
+						break;
+					case 'right':
+						testRotation = testRotation  + integer * (Math.PI/180);
+						break;
+					case 'left':
+						testRotation = testRotation  - integer * (Math.PI/180);
+						break;
+				}
+			}
+			length = problems.length;
+			var maxDistance = Math.pow(this.maxDetect, 2);
+			//Final location is testPosition, check to see if any of the correct object types are in range from the obstacle list
+			for(var i = 0;i < length;i++)
+			{
+				if(problems[i].type != type)
+					continue;
+				var distance = Math.pow(testPosition.x - problems[i].position.x, 2) + Math.pow(testPosition.y - problems[i].position.y, 2);
+				if(distance > maxDistance)
+					continue;
+				detected = true;
+				problems[i].detected = true;
+			}
+			//TODO: Change cmd_detect to also take success/failure
+			commands.push(['detect', type]);
+			return detected;
 		}
 		
 		right(integer)
@@ -112,16 +268,17 @@
 			commands.push(['reset']);
 		}
 		
+		
 		cmd_right(t, integer)
 		{
-			t.targetRotation = integer * (Math.PI/180);
+			t.targetRotation = t.startRotation + integer * (Math.PI/180);
 			t.startRotation = t.sprite.rotation;
 			return;
 		}
 		
 		cmd_left(t, integer)
 		{
-			t.targetRotation = -integer * (Math.PI/180);
+			t.targetRotation = t.startRotation  - integer * (Math.PI/180);
 			t.startRotation = t.sprite.rotation;
 			return;
 		}
@@ -173,9 +330,18 @@
 			t.sprite.rotation = 0;
 			t.moveMask();
 			t.graphics.clear();
+			evaluating = false;
 			return;
 		}
 		
+		cmd_detect(t, type)
+		{
+			t.detector.x = t.sprite.x;
+			t.detector.y = t.sprite.y;
+			t.detector.visible = true;
+			t.detector.play();
+		}
+				
 		drawLine(beginX, beginY, endX, endY)
 		{
 			if(this.penIsDown == true)
@@ -183,8 +349,6 @@
 				this.graphics.lineStyle(3, 0xFF0000);
 				this.graphics.moveTo(beginX, beginY);
 				this.graphics.lineTo(endX, endY);
-				//console.log(startingX, startingY, this.sprite.x, this.sprite.y);
-				//console.log("drew a line");
 			}
 		}		
 	}	
@@ -223,60 +387,63 @@
 	function setup()
 	{
 		t = new Turtle(pixiStage);
-		
-		setTimeout(commandList, 500);
-		setInterval(runIt, 32);
+		setupComplete = true;
+		setInterval(runIt, 32)
 		renderer.render(pixiStage);
 	}
 	
-	function commandList()
-	{
-		<!-- commands.push([t.forward, 50]); -->
-		<!-- commands.push([t.right, 90]); -->
-		<!-- commands.push([t.forward, 100]);	 -->
-		<!-- commands.push([t.back, 150]); -->
-		t.forward(50);
-		t.right(90);
-		t.forward(100);
-		t.back(150);
-		t.reset();
-		//commands.push(['forward', 50]);
-		//commands.push(['right', 90]);
-		//commands.push(['forward', 100]);	
-		//commands.push(['back', 150]);
-		updateTurtleCommands();
-	}
 	
+	function evaluateCode()
+	{
+		if(evaluating == true)
+			return;
+		if(setupComplete == false)
+		{
+			setTimeout(evaluate, 50);
+			return;
+		}
+		
+		//Get the div
+		div = editor.getValue();
+		eval(div);
+		t.reset();
+		updateTurtleCommands();
+		evaluating = true;
+	}
 	function turtleStep(command)
 	{
 		var nextStep = 0;
 		switch(command[0])
 		{
+		case 'reset':
+			t.cmd_reset(t);
+			break;
 		case 'forward':
 			t.cmd_forward(t, command[1]);
 			nextStep = command[1]/25 * 1000;
-		break;
+			break;
 		case 'back':
 			t.cmd_back(t, command[1]);
 			nextStep = command[1]/25 * 1000;
-		break;
+			break;
 		case 'left':
 			t.cmd_left(t, command[1]);
 			nextStep = command[1]/90 * 1000;	
-		break;
+			break;
 		case 'right':
 			t.cmd_right(t, command[1]);
 			nextStep = command[1]/90 * 1000;
-		break;
+			break;
 		case 'up':
 			t.cmd_up(t);
-		break;
+			break;
 		case 'down':
 			t.cmd_down(t);
-		break;
-		case 'reset':
-			t.cmd_reset(t);
-		break;
+			break;
+		case 'detect':
+			t.cmd_detect(t, command[1]);
+			nextStep = 1000;
+			setTimeout(function(){t.detector.visible = false}, nextStep);
 		}
 		return nextStep;
 	}
@@ -284,12 +451,10 @@
 	function updateTurtleCommands()
 	{
 		var hasNext = true;
-		console.log("Update Turtle Commands started.");
 		if(t.stepTimer > 0)
 		{
 			t.stepTimeRemaining = 0;
 			updateTurtleSprite();
-			console.log("Update Turtle Sprite Forced to Run at 0.");
 		}
 		t.targetPosition = null;
 		t.targetRotation = null;
@@ -298,7 +463,6 @@
 		if(commands == null || commands.length <= 0)
 			return;
 		
-		console.log("running command " + commands[0]);
 		var command = commands[0];
 		if(command != null)
 		{
@@ -309,7 +473,6 @@
 			if(timer > 0)
 				updateTurtleSprite();
 			
-			console.log("Waiting " + timer + " milliseconds.");
 			commands.shift();
 		}
 	}
@@ -318,12 +481,18 @@
 	{
 		pixiStage.removeChild(t.sprite);
 		pixiStage.addChild(t.sprite);
+		pixiStage.removeChild(t.detector);
+		pixiStage.addChild(t.detector);
 		renderer.render(pixiStage);
 		
 	}
-	//cmd_reset();
 	
-  </script>
-</body>
+	
+	</script>
+</div>
+</div>
 
-</html>
+
+</body> 
+
+</html> 

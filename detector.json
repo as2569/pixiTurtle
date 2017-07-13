@@ -1,8 +1,9 @@
 {
     "meta": {
         "image": "detector.png",
+
         "size": {"w":1024,"h":2048},
-        "scale": "2"
+        "scale": "3"
     },
     "frames": {
         "detector1":
