@@ -21,6 +21,7 @@ function onAssetsLoaded()
     // create an array of textures from an image path
     var frames = [];
 	var timesRan = 0;
+	var pulseDuration = 1;
 	
     for (var i = 1; i <= 25; i++)
 	{
@@ -29,21 +30,55 @@ function onAssetsLoaded()
 
     // create an AnimatedSprite 
     var anim = new PIXI.extras.AnimatedSprite(frames);
+	anim.runPulse = true;
+	anim.frameDelta = 1/frames.length;
+	
+	function pulse()
+	{
+		var lastLoop = (pulseDuration / anim.animationSpeed) + 1;
+		
+		if(this.runPulse == true)
+		{	
+			if(timesRan == 0)
+			{
+				anim.onFrameChange = function() {anim.alpha += this.frameDelta};
+				
+				console.log(timesRan + " increasing ");
+				timesRan++;
+				return;
+			}
+			else if(timesRan > 0 && timesRan < lastLoop)
+			{
+				console.log(timesRan + " staying the same ");
+				timesRan++;
+				return;
+			}
+			else
+			{
+				anim.onFrameChange = function() {anim.alpha -= this.frameDelta};
+				console.log(timesRan + " decreasing ");
+				this.runPulse = false;
+				return;
+			}
+		}
+	} 
 
     /*
      * An AnimatedSprite inherits all the properties of a PIXI sprite
      * so you can change its position, its anchor, mask it, etc
      */
+	 
     anim.x = app.renderer.width / 2;
     anim.y = app.renderer.height / 2;
-	anim.alpha = 50;
+	anim.alpha = 0;
     anim.anchor.set(0.5);
     anim.animationSpeed = 0.5;
-	anim.onLoop = function() {timesRan++, console.log(timesRan);}
-	anim.play();
-
-    app.stage.addChild(anim);
 	
+	anim.onLoop = pulse;
+	
+	
+	anim.play();
+    app.stage.addChild(anim);
     app.ticker.add();
 		
 }

@@ -15,4 +15,17 @@ function move(object, distance) {
 
 3rd (high end):
 	cutout: draw an image using mask and obscure some of it. Cutout the front image to look at back image. 
+
+7/12
+Loop Animation:
+fade in
+pulse for one second
+fade out
+stop
+
+Multiply:
+blue to green
+blue to red
+lerp thru animation
+based on var bool
 	
