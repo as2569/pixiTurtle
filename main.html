@@ -50,6 +50,10 @@ function openTab(evt, tabName) {
 
 <div style="background-color:00FFFF" id= "Code" class ="tabcontent">
 <textarea style="background-color:FFFFFF; border: none" id=yourcode cols="40" rows="10">
+t.right(90);
+t.forward(200);
+if(t.detect("infection"))
+	t.forward(50);
 </textarea><br /> 
 <!-- Create a simple CodeMirror instance -->
 <link rel="stylesheet" href="lib/codemirror.css">
@@ -164,7 +168,7 @@ asfsadff
 			this.detector.loop = true;
 			this.detector.visible = false;
 			this.detector.anchor.set(0.5);
-			
+			this.maxDetect = 50;
 			this.mask.anchor.set(0.5);
 			this.mask.x = 250;
 			this.mask.y = 250;
@@ -203,32 +207,37 @@ asfsadff
 			//Walk through the command list to find final destination, add an event to the stack if successful
 			for(var i = 0;i < length;i++)
 			{
-				switch(commands[0])
+				console.log("Reached");
+				switch(commands[i][0])
 				{
 					case 'forward':
-						testPosition.x = testPosition.x + integer * Math.cos(testRotation);
-						testPosition.y = testPosition.y + integer * Math.sin(testRotation);
+						testPosition.x = testPosition.x + commands[i][1] * Math.cos(testRotation);
+						testPosition.y = testPosition.y + commands[i][1] * Math.sin(testRotation);
+						console.log("(F) Test position: " + testPosition.x + ", " + testPosition.y);
 						break;
 					case 'back':
-						testPosition.x = testPosition.x - integer * Math.cos(testRotation);
-						testPosition.y = testPosition.y - integer * Math.sin(testRotation);
+						testPosition.x = testPosition.x - commands[i][1] * Math.cos(testRotation);
+						testPosition.y = testPosition.y - commands[i][1] * Math.sin(testRotation);
 						break;
 					case 'right':
-						testRotation = testRotation  + integer * (Math.PI/180);
+						testRotation = testRotation  + commands[i][1] * (Math.PI/180);
 						break;
 					case 'left':
-						testRotation = testRotation  - integer * (Math.PI/180);
+						testRotation = testRotation  - commands[i][1] * (Math.PI/180);
 						break;
 				}
 			}
 			length = problems.length;
 			var maxDistance = Math.pow(this.maxDetect, 2);
+			console.log("Max detect: " + maxDistance);
+			console.log("Test position: " + testPosition.x + ", " + testPosition.y);
 			//Final location is testPosition, check to see if any of the correct object types are in range from the obstacle list
 			for(var i = 0;i < length;i++)
 			{
 				if(problems[i].type != type)
 					continue;
 				var distance = Math.pow(testPosition.x - problems[i].position.x, 2) + Math.pow(testPosition.y - problems[i].position.y, 2);
+				console.log("Distance: " + distance);
 				if(distance > maxDistance)
 					continue;
 				detected = true;
@@ -454,6 +463,7 @@ asfsadff
 		if(t.stepTimer > 0)
 		{
 			t.stepTimeRemaining = 0;
+			t.stepTimer = 0;
 			updateTurtleSprite();
 		}
 		t.targetPosition = null;
