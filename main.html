@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Turtle</title>
+  <link rel="stylesheet" type="text/css" href="tabStyle.css">
 </head>
   <script src="pixi.js"></script>
   
@@ -51,7 +52,7 @@ function openTab(evt, tabName) {
 <div style="background-color:00FFFF" id= "Code" class ="tabcontent">
 <textarea style="background-color:FFFFFF; border: none" id=yourcode cols="40" rows="10">
 t.right(90);
-t.forward(200);
+t.forward(20);
 if(t.detect("infection"))
 	t.forward(50);
 </textarea><br /> 
@@ -168,6 +169,7 @@ asfsadff
 			this.detector.loop = true;
 			this.detector.visible = false;
 			this.detector.anchor.set(0.5);
+
 			this.maxDetect = 50;
 			this.mask.anchor.set(0.5);
 			this.mask.x = 250;
@@ -180,7 +182,6 @@ asfsadff
 			this.sprite.y = screenHeight/2;
 			this.sprite.rotation = 0;
 			this.penIsDown = true;
-			
 			this.backskin.tint = 0x001888;
 			stage.addChild(this.backskin);
 			stage.addChild(this.guts);
@@ -188,8 +189,9 @@ asfsadff
 			stage.addChild(this.graphics);
 			stage.addChild(this.mask);
 			stage.addChild(this.skin);
-			stage.addChild(this.detector);
 			stage.addChild(this.grid);
+			this.sprite.addChild(this.detector);
+
 		}
 		
 		moveMask()
@@ -345,8 +347,6 @@ asfsadff
 		
 		cmd_detect(t, type)
 		{
-			t.detector.x = t.sprite.x;
-			t.detector.y = t.sprite.y;
 			t.detector.visible = true;
 			t.detector.play();
 		}
@@ -491,8 +491,6 @@ asfsadff
 	{
 		pixiStage.removeChild(t.sprite);
 		pixiStage.addChild(t.sprite);
-		pixiStage.removeChild(t.detector);
-		pixiStage.addChild(t.detector);
 		renderer.render(pixiStage);
 		
 	}
