@@ -28,4 +28,6 @@ blue to green
 blue to red
 lerp thru animation
 based on var bool
-	
+
+
+Have codeMirror follow rest of style

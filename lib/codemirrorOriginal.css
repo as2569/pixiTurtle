@@ -2,11 +2,9 @@
 
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
-  box-sizing: border-box;
   font-family: monospace;
-  height: 100%; 
+  height: 300px;
   color: black;
-  
 }
 
 /* PADDING */
@@ -137,7 +135,7 @@
 .cm-s-default .cm-error {color: #f00;}
 .cm-invalidchar {color: #f00;}
 
-/* .CodeMirror-composing { border-bottom: 2px solid; } */
+.CodeMirror-composing { border-bottom: 2px solid; }
 
 /* Default styles for common addons */
 
