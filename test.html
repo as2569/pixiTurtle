@@ -12,6 +12,17 @@
 var app = new PIXI.Application();
 document.body.appendChild(app.view);
 
+function lerpColor(a, b, amount) { 
+
+    var 
+        ar = a >> 16, ag = a >> 8 & 0xff, ab = a & 0xff,
+        br = b >> 16, bg = b >> 8 & 0xff, bb = b & 0xff,
+        rr = parseInt(ar + amount * (br - ar)),
+        rg = parseInt(ag + amount * (bg - ag)),
+        rb = parseInt(ab + amount * (bb - ab));
+
+    return (rr << 16) + (rg << 8) + rb;
+}
 PIXI.loader
     .add('detector.json')
     .load(onAssetsLoaded);
@@ -21,6 +32,10 @@ function onAssetsLoaded()
     // create an array of textures from an image path
     var frames = [];
 	var timesRan = 0;
+	var pulseDuration = 1;
+	
+	//0 for green, 1 for red
+	var tintColor;
 	
     for (var i = 1; i <= 25; i++)
 	{
@@ -29,21 +44,64 @@ function onAssetsLoaded()
 
     // create an AnimatedSprite 
     var anim = new PIXI.extras.AnimatedSprite(frames);
+	anim.runPulse = true;
+	anim.frameDelta = 1/frames.length;
+	anim.startColor = 0xFFFFFF;
+	anim.endColor = 0x00FF00;
+	
+	
+	function pulse()
+	{
+		var lastLoop = parseInt(pulseDuration / anim.animationSpeed) + 2;
+		
+		if(this.runPulse == true)
+		{	
+			if(timesRan == 0)
+			{
+				anim.onFrameChange = function() 
+				{
+					anim.alpha += this.frameDelta;
+					var fraction = (timesRan + anim.currentFrame/anim.totalFrames) / lastLoop;
+					console.log("Fraction: " + fraction);
+					anim.tint = lerpColor(this.startColor, this.endColor, fraction);
+				};
+				
+				console.log(timesRan + " increasing ");
+				timesRan++;
+				return;
+			}
+			else if(timesRan > 0 && timesRan < lastLoop)
+			{
+				console.log(timesRan + " staying the same ");
+				timesRan++;
+				return;
+			}
+			else
+			{
+				anim.onFrameChange = function() {anim.alpha -= this.frameDelta};
+				console.log(timesRan + " decreasing ");
+				this.runPulse = false;
+				return;
+			}
+		}
+	} 
 
     /*
      * An AnimatedSprite inherits all the properties of a PIXI sprite
      * so you can change its position, its anchor, mask it, etc
      */
+	 
     anim.x = app.renderer.width / 2;
     anim.y = app.renderer.height / 2;
-	anim.alpha = 50;
+	anim.alpha = 0;
     anim.anchor.set(0.5);
     anim.animationSpeed = 0.5;
-	anim.onLoop = function() {timesRan++, console.log(timesRan);}
-	anim.play();
-
-    app.stage.addChild(anim);
 	
+	anim.onLoop = pulse;
+	
+	
+	anim.play();
+    app.stage.addChild(anim);
     app.ticker.add();
 		
 }
