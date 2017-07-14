@@ -12,6 +12,17 @@
 var app = new PIXI.Application();
 document.body.appendChild(app.view);
 
+function lerpColor(a, b, amount) { 
+
+    var 
+        ar = a >> 16, ag = a >> 8 & 0xff, ab = a & 0xff,
+        br = b >> 16, bg = b >> 8 & 0xff, bb = b & 0xff,
+        rr = parseInt(ar + amount * (br - ar)),
+        rg = parseInt(ag + amount * (bg - ag)),
+        rb = parseInt(ab + amount * (bb - ab));
+
+    return (rr << 16) + (rg << 8) + rb;
+}
 PIXI.loader
     .add('detector.json')
     .load(onAssetsLoaded);
@@ -23,6 +34,9 @@ function onAssetsLoaded()
 	var timesRan = 0;
 	var pulseDuration = 1;
 	
+	//0 for green, 1 for red
+	var tintColor;
+	
     for (var i = 1; i <= 25; i++)
 	{
 		frames.push(PIXI.Texture.fromFrame('detector' + i));
@@ -32,16 +46,25 @@ function onAssetsLoaded()
     var anim = new PIXI.extras.AnimatedSprite(frames);
 	anim.runPulse = true;
 	anim.frameDelta = 1/frames.length;
+	anim.startColor = 0xFFFFFF;
+	anim.endColor = 0x00FF00;
+	
 	
 	function pulse()
 	{
-		var lastLoop = (pulseDuration / anim.animationSpeed) + 1;
+		var lastLoop = parseInt(pulseDuration / anim.animationSpeed) + 2;
 		
 		if(this.runPulse == true)
 		{	
 			if(timesRan == 0)
 			{
-				anim.onFrameChange = function() {anim.alpha += this.frameDelta};
+				anim.onFrameChange = function() 
+				{
+					anim.alpha += this.frameDelta;
+					var fraction = (timesRan + anim.currentFrame/anim.totalFrames) / lastLoop;
+					console.log("Fraction: " + fraction);
+					anim.tint = lerpColor(this.startColor, this.endColor, fraction);
+				};
 				
 				console.log(timesRan + " increasing ");
 				timesRan++;
