@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
- 
 
 <head>
   <meta charset="utf-8">
@@ -91,6 +90,7 @@ asfsadff
 	<!-- console.log("click"); -->
 </script>
 <button type="button" onclick="evaluateCode()">Run</button> 
+<button type="button" onclick="analyzeCode()">Analyze</button> 
 </div>
 
 <div id = "turtle" style = "display: inline-block; float: right; text-align: left; width:50%">
@@ -100,6 +100,7 @@ asfsadff
 <!-- <canvas width = "400" height = "800" style="background-image:url('image.png')" id="mycanvas"> -->
 <div class= "canvas" id="mycanvas">
   <script src="pixi.js"></script>
+  <script src="https://unpkg.com/esprima@~3.1/dist/esprima.js"></script>
   
   <script type="text/javascript">
 	//check if PIXI is loaded 
@@ -143,7 +144,7 @@ asfsadff
 	problems.push({position:{x:250, y:250}, type:'infection', detected:false});
 	class Turtle
 	{			
-		//constructor
+		//constructor t5
 		constructor(stage)
 		{	
 			//this tells JS to assume that member variable called .whatever exists within calling object, and to work with it
@@ -396,6 +397,14 @@ asfsadff
 		renderer.render(pixiStage);
 	}
 	
+	function analyzeCode(code)
+	{
+	console.log("Analyzing code");
+	div = editor.getValue();
+	console.log(div);
+	var syntax = esprima.parse(div);
+	console.log(syntax);
+	}
 	
 	function evaluateCode()
 	{
