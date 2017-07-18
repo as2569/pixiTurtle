@@ -31,3 +31,5 @@ based on var bool
 
 
 Have codeMirror follow rest of style
+as in --> Light text on Dark background,
+Border for both canvas and editor, 
