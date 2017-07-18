@@ -435,10 +435,13 @@ asfsadff
 		//console.log(div);
 		var syntax = esprima.parse(div);
 		console.log(syntax);
-	
+		//
+		document.getElementById("tree").innerHTML = JSON.stringify(syntax);
 		editor.getDoc().setValue(escodegen.generate(syntax));		
 		console.log(editor.getValue());
 	}
+	
+	
 	
 	function evaluateCode()
 	{
@@ -538,8 +541,10 @@ asfsadff
 	</script>
 </div>
 </div>
-
-
+<div>
+<p style="margin-top:2.5em;padding: 0 15em 2em 0;border-width: 2px; border-color: black; border-style:solid;">
+<font id="tree"; face="Arial" size="2"></font></p>
+</div>
 </body> 
-
 </html> 
+
