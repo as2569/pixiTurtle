@@ -10,8 +10,6 @@
   
 <body>
 <script type="text/javascript"> 
-
-
 	
 function openTab(evt, tabName) {
     // Declare all variables
@@ -36,7 +34,8 @@ function openTab(evt, tabName) {
 	
 </script> 
 
-<div id = "editor" style = "display: inline-block; float: left; text-align: left; width:50%">
+<!-- <div id = "editor" style = "display: inline-block; float: left; text-align: left"> -->
+<div class= "editor" id = "editor" style = "float: left; text-align: left">
 
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'Code')" id = "defaultOpen">Code</button>
@@ -44,18 +43,16 @@ function openTab(evt, tabName) {
   <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
 </div>
 
-
-
-
 <!-- <div id = "editor" style = "display: inline-block; float: left; text-align: left; width:50%"> -->
 
-<div style="background-color:00FFFF" id= "Code" class ="tabcontent">
-<textarea style="background-color:FFFFFF; border: none" id=yourcode cols="40" rows="10">
-t.right(90);
-t.forward(20);
-if(t.detect("infection"))
-	t.forward(50);
-</textarea><br /> 
+<div class ="tabcontent" style="background-color:00FFFF" id= "Code" >
+	<textarea id=yourcode>
+	t.right(90);
+	t.forward(20);
+	if(t.detect("infection"))
+		t.forward(50);
+	</textarea><br /> 
+
 <!-- Create a simple CodeMirror instance -->
 <link rel="stylesheet" href="lib/codemirror.css">
 <script src="lib/codemirror.js"></script>
@@ -78,7 +75,7 @@ if(t.detect("infection"))
 </div>
 
 <div id = "Instructions" class="tabcontent">
-<textarea style="border: none" cols="40" rows="10">
+<textarea style="border: none" cols="40" rows="40">
 iashdfisadf
 asdfsadfsdf
 asdgsadg
@@ -93,8 +90,8 @@ asfsadff
 	<!-- console.log("click"); -->
 </script>
 <button type="button" onclick="evaluateCode()">Run</button> 
+<button type="button" onclick="analyzeCode()">Analyze</button> 
 </div>
-<!-- </div> -->
 
 <div id = "turtle" style = "display: inline-block; float: right; text-align: left; width:50%">
 <!-- Just the output, NO turtle graphics -->
@@ -103,6 +100,7 @@ asfsadff
 <!-- <canvas width = "400" height = "800" style="background-image:url('image.png')" id="mycanvas"> -->
 <div class= "canvas" id="mycanvas">
   <script src="pixi.js"></script>
+  <script src="https://unpkg.com/esprima@~3.1/dist/esprima.js"></script>
   
   <script type="text/javascript">
 	//check if PIXI is loaded 
@@ -126,14 +124,12 @@ asfsadff
 	
 	//pixi Graphics
 	var graphics = new PIXI.Graphics();
-	//setting this will make all adjustment relative to this as origin
-	//graphics.position.set(x, y);
 	
 	//renderer
 	var renderer = PIXI.autoDetectRenderer(screenWidth, screenHeight);
 	document.body.appendChild(renderer.view);
 	renderer.backgroundColor = 0xd4cece;
-	renderer.view.style.border = "1px solid black";
+	renderer.view.style.border = "1px solid #ccc";
 	
 	//load texture
 	PIXI.loader
@@ -148,7 +144,7 @@ asfsadff
 	problems.push({position:{x:250, y:250}, type:'infection', detected:false});
 	class Turtle
 	{			
-		//constructor
+		//constructor t5
 		constructor(stage)
 		{	
 			//this tells JS to assume that member variable called .whatever exists within calling object, and to work with it
@@ -401,6 +397,14 @@ asfsadff
 		renderer.render(pixiStage);
 	}
 	
+	function analyzeCode(code)
+	{
+	console.log("Analyzing code");
+	div = editor.getValue();
+	console.log(div);
+	var syntax = esprima.parse(div);
+	console.log(syntax);
+	}
 	
 	function evaluateCode()
 	{
