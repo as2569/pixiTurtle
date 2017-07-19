@@ -3,7 +3,7 @@
         "image": "detector.png",
 
         "size": {"w":1024,"h":2048},
-        "scale": "3"
+        "scale": ".2"
     },
     "frames": {
         "detector1":
