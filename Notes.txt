@@ -28,37 +28,6 @@ blue to green
 blue to red
 lerp thru animation
 based on var bool
-	
-simple trig functions to avoid physics and vectors
-
-function move(object, distance) {
-	object.x = object.x + distance * Math.cos(object.rotation);
-	object.y = object.y + distance * Math.sin(object.rotation);
-}
-
-6/27
-1st (immediate):
-	animation of circle 
-	start at center of turtle, expand outward to 3x size of turtle then fade
-
-2nd:
-	animate actions
-
-3rd (high end):
-	cutout: draw an image using mask and obscure some of it. Cutout the front image to look at back image. 
-
-7/12
-Loop Animation:
-fade in
-pulse for one second
-fade out
-stop
-
-Multiply:
-blue to green
-blue to red
-lerp thru animation
-based on var bool
 
 
 Have codeMirror follow rest of style

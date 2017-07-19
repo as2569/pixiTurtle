@@ -6,7 +6,8 @@
   <title>Turtle</title>
   <link rel="stylesheet" type="text/css" href="tabStyle.css">
 </head>
-  <script src="pixi.js"></script>
+
+<script src="pixi.js"></script>
   
 <body>
 <script type="text/javascript"> 
@@ -34,7 +35,6 @@ function openTab(evt, tabName) {
 	
 </script> 
 
-<!-- <div id = "editor" style = "display: inline-block; float: left; text-align: left"> -->
 <div class= "editor" id = "editor" style = "float: left; text-align: left">
 
 <div class="tab">
@@ -43,7 +43,6 @@ function openTab(evt, tabName) {
   <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
 </div>
 
-<!-- <div id = "editor" style = "display: inline-block; float: left; text-align: left; width:50%"> -->
 
 <div class ="tabcontent" style="background-color:00FFFF" id= "Code" >
 	<textarea id=yourcode>
@@ -52,27 +51,38 @@ function openTab(evt, tabName) {
 	if(t.detect("infection"))
 		t.forward(50);
 	</textarea><br /> 
+</div>
+	
+<div class ="tabcontent" id = "Output">
+<!-- What do you do <pre> ? -->
+<!-- <pre id="output"></pre> -->
+<textarea id="outputcode" style = "background-color: white; width:100%; height:100%;">
+Your output will appear here!
+</textarea><br />
 
+</div>	
+	
 <!-- Create a simple CodeMirror instance -->
 <link rel="stylesheet" href="lib/codemirror.css">
 <script src="lib/codemirror.js"></script>
 <script src="mode/javascript/javascript.js"></script>
+
   <script>
 	var editor = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
       lineNumbers: true,
       mode: "text/html",
       matchBrackets: true
     });
+	
+	<!-- Spryszynski, outside my scope of work? -->
+	<!-- var output = CodeMirror.fromTextArea(document.getElementById("outputcode"), { -->
+		<!-- lineNumbers: true, -->
+		<!-- mode: "text/html", -->
+		<!-- matchBrackets: true -->
+	<!-- }); -->
+		
   </script>
 
-
-</div>
-
-<div id = "Output" class ="tabcontent">
-
-<pre id="output"></pre>
- 
-</div>
 
 <div id = "Instructions" class="tabcontent">
 <textarea style="border: none" cols="40" rows="40">
@@ -88,10 +98,25 @@ asfsadff
 <script>
 	document.getElementById("defaultOpen").click();
 	<!-- console.log("click"); -->
+	
+	//Get cookie
+	var cookie = document.cookie;
+	if(cookie.length == 0)
+	{
+		console.log("no cookie");
+		//Possibly create cookie?
+	}
+	else
+	{
+		console.log(cookie);
+	}
 </script>
+
 <button type="button" onclick="evaluateCode()">Run</button> 
 <button type="button" onclick="analyzeCode()">Analyze</button> 
+
 </div>
+
 
 <div id = "turtle" style = "display: inline-block; float: right; text-align: left; width:50%">
 <!-- Just the output, NO turtle graphics -->
@@ -101,8 +126,11 @@ asfsadff
 <div class= "canvas" id="mycanvas">
   <script src="pixi.js"></script>
   <script src="https://unpkg.com/esprima@~3.1/dist/esprima.js"></script>
+  <script src="escodegen.browser.js"</script>
+  <script type="text/javascript"></script>
   
-  <script type="text/javascript">
+  <script>
+  
 	//check if PIXI is loaded 
     var type = "WebGL"
     if(!PIXI.utils.isWebGLSupported())
@@ -328,6 +356,7 @@ asfsadff
 		{
 			this.penIsDown = true;
 			return;
+			
 		}
 		
 		cmd_reset(t)
@@ -399,12 +428,18 @@ asfsadff
 	
 	function analyzeCode(code)
 	{
-	console.log("Analyzing code");
-	div = editor.getValue();
-	console.log(div);
-	var syntax = esprima.parse(div);
-	console.log(syntax);
+		console.log("Analyzing code");
+		div = editor.getValue();
+		//console.log(div);
+		var syntax = esprima.parse(div);
+		console.log(syntax);
+		//
+		document.getElementById("outputcode").innerHTML = JSON.stringify(syntax);
+		editor.getDoc().setValue(escodegen.generate(syntax));		
+		console.log(editor.getValue());
 	}
+	
+	
 	
 	function evaluateCode()
 	{
@@ -423,6 +458,7 @@ asfsadff
 		updateTurtleCommands();
 		evaluating = true;
 	}
+	
 	function turtleStep(command)
 	{
 		var nextStep = 0;
@@ -503,8 +539,10 @@ asfsadff
 	</script>
 </div>
 </div>
-
-
+<!-- <div> -->
+<!-- <p style="margin-top:2.5em;padding: 0 15em 2em 0;border-width: 2px; border-color: black; border-style:solid;"> -->
+<!-- <font id="tree"; face="Arial" size="2"></font></p> -->
+<!-- </div> -->
 </body> 
-
 </html> 
+
