@@ -8,7 +8,7 @@
 </head>
 
 <script src="pixi.js"></script>
-  
+<script src="validator.js"></script> 
 <body>
 <script type="text/javascript"> 
 	
@@ -86,11 +86,49 @@ Your output will appear here!
 
 <div id = "Instructions" class="tabcontent">
 <textarea style="border: none" cols="40" rows="40">
-iashdfisadf
-asdfsadfsdf
-asdgsadg
-asdfsdaf
-asfsadff
+Probe commands:
+
+probe.forward(##) 			: moves the probe forward by ## units
+probe.back(##)    			: moves the probe backward by ## units
+probe.left(##)    			: turns the probe ## degrees to its left
+probe.right(##)   			: turns the probe ## degrees to its right
+probe.detect("infection")	: detects infection within 50 units of the probe
+probe.detect("damage")		: detects bone damage within 50 units of the probe
+probe.detect("pressure")	: detects pressure buildup within 50 units of the probe
+probe.fuse()				: repairs bone damage within 50 units of the probe
+probe.cleanse()				: cleanses infection within 50 units of the probe
+probe.mark(##)				: marks the probe's location with signal code ##
+probe.laser([true/false])	: Will turn on or off the laser used to relieve pressure
+probe.suture([true/false])	: Will turn on or off the suture used to close a laser incision
+probe.reinforce()			: Reinforces the surrounding tissue biochemically
+
+Warnings:
+* Cleansing an area that has no infection may weaken your patient's immune system
+
+* Fusing a bone that is already whole may seriously injure your patient.
+* Fusing a bone while an infection is present will seal the infection into the bone
+and will put your patient's health into serious risk
+
+* Detecting pressure will report a score between 10 and 200
+* Pressure above acceptable limits signals buildup and should be relieved using the laser
+*(The following chart can be used to identify if pressure is correct:
+	Systolic Artery: 	100-140
+	Diastolic Artery: 	60-90
+	Vein:			  	3-7
+	Arterial Capilary:	30
+	Venous Capilary:	10
+	Middle Ear:			0-1
+	Eye:				20
+	Brain:				5-12
+	Gastrointestinal:	10-20
+	Intrathoracic:		-10
+ )
+ 
+* Pressure below acceptable limits signals weakened tissue and should be reinforced
+* Reinforcing strong tissue can cause the tissue to be too stiff to work effectively
+
+* You must suture any area that is opened by the laser to avoid life-threatening infections
+* You must cleanse any area that is opened by the laser before suturing to avoid sealing infections
 </textarea><br /> 
 </div>
 
@@ -103,12 +141,11 @@ asfsadff
 	var cookie = document.cookie;
 	if(cookie.length == 0)
 	{
-		console.log("no cookie");
-		//Possibly create cookie?
+		window.location.href = "https://web.njit.edu/~ust3/testbed/login.html";
 	}
 	else
 	{
-		console.log(cookie);
+		validateCookie(false);
 	}
 </script>
 

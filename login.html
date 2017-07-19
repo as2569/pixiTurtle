@@ -6,25 +6,13 @@
 Login page
 </title>
 </head>
+<script src="validator.js"></script>
 <script>
 (function(action){action()})(function(){
-//TODO:
-//Do they have the cookie?
-//Does it have a username and an id?
-//Setup the http request posting activity=validate&username=username&id=id
-//Get the response back and if successful, pass them on to the game
-//If not successful, delete their cookie
-	console.log(document.cookie);
-	if(document.cookie == "")
-	{
-	
-	}
 	if(document.cookie != "")
 	{
-		validateCookie();
+		validateCookie(true)	
 	}
-	
-	console.log(document.cookie);
 });
 </script>
 <!-- web.njit.edu/~ust3/testbed/example.php -->
@@ -39,162 +27,8 @@ Login page
 <div id=output>
 </div>
 
-<script>
-function validateCookie()
-{
-		//var params = "username=" + document.getElementById("username").value + "&password=" + document.getElementById("password").value;
-		//Spryszynski
-		//var params = document.cookie.
-		var xmlhttp = new XMLHttpRequest();
-		
-        xmlhttp.onreadystatechange = function()
-		{
-			if (this.readyState == 4)
-			{
-				if(this.status == 200)
-				{
-					//TODO: Data received in responseText is a string of a json object
-					//Format is:
-					//{"status":"success","details":"Data returned.","length":0,"data":["test","123454321"]}
-					//obj.data[0]
-					//obj.data[1]
-					//Build a cookie using that information
-					//Push them on to the game
-					
-					//Evaluate JSON into JS object
-					var responseObj = JSON;
-					if(responseObj.status != "success")
-					{
-						document.cookie = "; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-					}
-					
-					//Create cookie
-					//document.cookie = "username=" + responseObj.data[0];
-					//document.cookie = "id=" + responseObj.data[1];
-					//console.log(document.cookie);	
-				}	
-        };
-		
-        xmlhttp.open("POST", "https://web.njit.edu/~ust3/testbed/example.php", true);
-		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xmlhttp.send(params);
-    }	
-}
+</html>
 
-function check(user)
-{
-	//var params = "username=" + document.getElementById("username").value + "&password=" + document.getElementById("password").value;
-	var params = null;
-    if (user.length == 0)
-	{ 
-		console.log("user is 0 length");
-        return;
-    } 
-	else
-	{
-        var xmlhttp = new XMLHttpRequest();
-		
-        xmlhttp.onreadystatechange = function()
-		{
-			if (this.readyState == 4)
-			{
-				if(this.status == 200)
-				{
-					//TODO: Data received in responseText is a string of a json object
-					//Format is:
-					//{"status":"success","details":"Data returned.","length":0,"data":["test","123454321"]}
-					//obj.data[0]
-					//obj.data[1]
-					//Build a cookie using that information
-					//Push them on to the game
-					
-					//Evaluate JSON into JS object
-					responseObj = eval(this.responseText);
-					
-					//Create cookie
-					//document.cookie = "username=" + responseObj.data[0];
-					//document.cookie = "id=" + responseObj.data[1];
-					//console.log(document.cookie);
-					
-				}else{
-				
-					//Create cookie
-					var fake = {"status":"success","details":"Data returned.","length":0,"data":["test","123454321"]};
-					var responseObj = eval(fake);
-					console.log("Current cookies are: " + document.cookie);
-					if(document.cookie == null)
-						console.log("It is null.");
-					if(typeof document.cookie == 'undefined')
-						console.log("No really, javascript is bullshit.");
-					if(document.cookie == "")
-						console.log("Empty string, because of course it is.");
-						
-					var cookie = "{\"name\":\"test\", \"password\":\"bed\"};path=/";
-					document.cookie = cookie;
-					console.log("Precheck: " + document.cookie);
-					var str = document.cookie;
-					var data = str.split(";");
-					console.log("DATA IS: " + data);
-					var dataset = JSON.parse(data);
-					console.log(dataset.name + " " + dataset.password);
-					dataset.name = "newname";
-					document.cookie = JSON.stringify(dataset) + ";path=/";
-					document.cookie = "; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-					
-					//DELETE cookie
-					//document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-					//document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-					
-					console.log(document.cookie);
-
-					console.log("failed");
-				}
-			}
-			
-        };
-		
-        xmlhttp.open("POST", "https://web.njit.edu/~ust3/testbed/example.php", true);
-		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xmlhttp.send(params);
-    }
-}
-
-<!-- function check(form) -->
-<!-- { -->
-	<!-- //enter sql here -->
-	<!-- //ask for record with key userID and compare pass.value to value of pass from database -->
-
-	<!-- var id = login.userid.value; -->
-	<!-- var password = 'pass'; -->
-	<!-- console.log(id + " " + login.pass.value); -->
-	
-	<!-- //Get cookie -->
-	<!-- var cookie = document.cookie; -->
-	<!-- if(cookie.length == 0) -->
-	<!-- { -->
-		<!-- console.log("no cookie"); -->
-		<!-- document.cookie = "cookieName = " + id + ";domain=.example.com;path=/"; -->
-		
-		<!-- console.log("creating cookie" + document.cookie); -->
-	<!-- } -->
-	<!-- else -->
-	<!-- { -->
-		<!-- console.log(cookie); -->
-	<!-- } -->
-	
-	<!-- if(login.pass.value == password) -->
-	<!-- { -->
-		<!-- console.log("login OK"); -->
-		<!-- location.replace("main.html"); -->
-	<!-- } -->
-	<!-- else -->
-	<!-- { -->
-		<!-- console.log("unable to login"); -->
-		
-	<!-- } -->
-	
-<!-- } -->
-</script>
 
 
 
