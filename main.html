@@ -46,10 +46,10 @@ function openTab(evt, tabName) {
 
 <div class ="tabcontent" style="background-color:00FFFF" id= "Code" >
 	<textarea id=yourcode>
-	t.right(90);
-	t.forward(20);
-	if(t.detect("infection"))
-		t.forward(50);
+t.right(90);
+t.forward(20);
+if(t.detect("infection"))
+	t.forward(50);
 	</textarea><br /> 
 </div>
 	
@@ -66,22 +66,32 @@ Your output will appear here!
 <link rel="stylesheet" href="lib/codemirror.css">
 <script src="lib/codemirror.js"></script>
 <script src="mode/javascript/javascript.js"></script>
+<script src="addon/breakPoint/breakPoint.js"></script>
 
-  <script>
-	var editor = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
-      lineNumbers: true,
-      mode: "text/html",
-      matchBrackets: true
-    });
-	
-	<!-- Spryszynski, outside my scope of work? -->
-	<!-- var output = CodeMirror.fromTextArea(document.getElementById("outputcode"), { -->
-		<!-- lineNumbers: true, -->
-		<!-- mode: "text/html", -->
-		<!-- matchBrackets: true -->
-	<!-- }); -->
-		
-  </script>
+<script>
+console.log("1");
+var editor = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
+  lineNumbers: true,
+  breakpoints: true,
+  
+  gutters: ["CodeMirror-linenumbers", "breakpoints"]
+});
+console.log("2");
+
+function checkBreak(line){
+console.log("Checking Line Number: "+line);
+//cm = this;
+var a = hasBreakPoint(editor,line);
+console.log(a);
+return a;
+}
+
+function getLine(line){
+console.log("Getting line info for: "+line);
+console.log(getLineInfo(editor,line));
+}
+
+</script>
 
 
 <div id = "Instructions" class="tabcontent">
@@ -107,8 +117,9 @@ probe.reinforce()        : Reinforces the surrounding tissue biochemically
 <br>
 <script>
 	document.getElementById("defaultOpen").click();
+	//VALIDATION< UNCOMMENT BEFORE PUSHING
 	<!-- console.log("click"); -->
-	
+	/*
 	//Get cookie
 	var cookie = document.cookie;
 	if(cookie.length == 0)
@@ -119,6 +130,7 @@ probe.reinforce()        : Reinforces the surrounding tissue biochemically
 	{
 		validateCookie(false);
 	}
+	*/
 </script>
 
 <button type="button" onclick="evaluateCode()">Run</button> 

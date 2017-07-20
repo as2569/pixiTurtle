@@ -6,7 +6,6 @@
   font-family: monospace;
   height: 100%; 
   color: black;
-  
 }
 
 /* PADDING */
@@ -15,7 +14,7 @@
   padding: 4px 0; /* Vertical padding around content */
 }
 .CodeMirror pre {
-  padding: 0 4px; /* Horizontal padding of content */
+  padding: 0 50px; /* Horizontal padding of content */
 }
 
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -25,14 +24,15 @@
 /* GUTTER */
 
 .CodeMirror-gutters {
-  border-right: 1px solid #ddd;
-  background-color: #f7f7f7;
+  border-right: 25px solid #ddd;
+  border-left: 15px solid #ffe182;
+  background-color: #ffe182;
   white-space: nowrap;
 }
 .CodeMirror-linenumbers {}
 .CodeMirror-linenumber {
-  padding: 0 3px 0 5px;
-  min-width: 20px;
+  padding: 0 3px 0 10px;
+  min-width: 10px;
   text-align: right;
   color: #999;
   white-space: nowrap;
@@ -225,6 +225,8 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   cursor: default;
   z-index: 4;
 }
+
+
 .CodeMirror-gutter-wrapper ::selection { background-color: transparent }
 .CodeMirror-gutter-wrapper ::-moz-selection { background-color: transparent }
 
